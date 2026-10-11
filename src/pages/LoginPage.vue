@@ -3,12 +3,14 @@
     <q-page-container>
       <q-page class="login-page flex flex-center">
         <q-card class="login-card shadow-10 q-pa-lg">
-          <!-- Header / Branding -->
+          <!-- Header / Branding con Logo Oficial XIS -->
           <div class="text-center q-mb-lg">
-            <q-avatar size="72px" color="primary" text-color="white" class="shadow-3 q-mb-sm">
-              <q-icon name="laptop_chromebook" size="42px" />
-            </q-avatar>
-            <div class="text-h5 text-weight-bold text-primary">ERP XIS</div>
+            <div class="login-logo-wrapper q-mb-sm shadow-3">
+              <img src="@/assets/xis-logo.png" alt="XIS Logo" class="login-logo-img" />
+            </div>
+            <div class="text-h5 text-weight-bolder text-primary">
+              ERP <span class="text-secondary">XIS</span>
+            </div>
             <div class="text-caption text-grey-7">
               Gestión Integral de Taller y Servicios de Cómputo
             </div>
@@ -170,7 +172,7 @@ async function handleLogin() {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #42a5f5 100%);
+  background: linear-gradient(135deg, #091c4d 0%, #1254e0 50%, #0f172a 100%);
   padding: 16px;
 }
 
@@ -179,6 +181,25 @@ async function handleLogin() {
   max-width: 420px;
   border-radius: 16px;
   background-color: #ffffff;
+}
+
+.login-logo-wrapper {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(92, 184, 17, 0.4);
+}
+
+.login-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .border-negative {

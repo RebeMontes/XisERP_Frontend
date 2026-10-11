@@ -1,50 +1,98 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="bg-primary text-white">
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+  <q-layout view="lHh Lpr lFf" class="bg-grey-1">
+    <!-- Topbar Premium y Estándar Empresarial -->
+    <q-header elevated class="bg-white text-dark topbar-header">
+      <q-toolbar class="q-px-md">
+        <!-- Botón para alternar menú lateral -->
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Alternar menú"
+          color="primary"
+          @click="toggleLeftDrawer"
+          class="q-mr-sm"
+        />
 
-        <q-toolbar-title class="row items-center no-wrap">
-          <q-icon name="laptop_chromebook" size="28px" class="q-mr-sm" />
-          <span class="text-weight-bold">ERP XIS</span>
-          <span class="text-caption q-ml-sm text-blue-2 gt-xs">Control de Reparaciones</span>
+        <!-- Título / Contexto del ERP -->
+        <q-toolbar-title class="row items-center no-wrap text-subtitle1">
+          <span class="text-weight-bold text-primary">ERP XIS</span>
+          <q-separator vertical inset class="q-mx-sm gt-xs" />
+          <span class="text-caption text-grey-7 gt-xs">Control de Reparaciones y Soporte</span>
         </q-toolbar-title>
 
-        <!-- User profile & Logout menu -->
-        <div class="row items-center q-gutter-sm">
-          <q-btn flat no-caps class="q-px-sm">
+        <q-space />
+
+        <!-- Badge de Taller / Empresa Activa -->
+        <div class="gt-sm q-mr-md">
+          <q-badge
+            color="green-1"
+            text-color="secondary"
+            class="q-py-xs q-px-sm border-secondary text-weight-medium"
+          >
+            <q-icon name="storefront" size="14px" class="q-mr-xs" />
+            Taller Principal
+          </q-badge>
+        </div>
+
+        <!-- Perfil del Usuario y Acciones -->
+        <div class="row items-center q-gutter-x-sm">
+          <q-btn flat no-caps class="user-menu-btn q-px-sm border-radius-8">
             <div class="row items-center no-wrap">
-              <q-avatar size="32px" color="blue-9" text-color="white" class="q-mr-xs">
-                {{ userInitials }}
-              </q-avatar>
-              <div class="column text-left gt-xs">
-                <span class="text-weight-bold text-caption">{{ authStore.userName }}</span>
-                <span class="text-caption text-blue-2" style="font-size: 10px">
+              <div class="relative-position q-mr-sm">
+                <q-avatar size="34px" color="primary" text-color="white" class="text-weight-bold">
+                  {{ userInitials }}
+                </q-avatar>
+                <span class="avatar-status-badge"></span>
+              </div>
+
+              <div class="column text-left gt-xs q-mr-xs">
+                <span class="text-weight-bold text-caption text-dark line-height-tight">
+                  {{ authStore.userName }}
+                </span>
+                <span
+                  class="text-caption text-secondary text-weight-medium"
+                  style="font-size: 11px"
+                >
                   {{ authStore.userRole === 'admin' ? 'Administrador' : 'Técnico' }}
                 </span>
               </div>
-              <q-icon name="arrow_drop_down" size="18px" />
+              <q-icon name="keyboard_arrow_down" size="18px" color="grey-7" />
             </div>
 
-            <q-menu auto-close>
-              <q-list style="min-width: 200px">
-                <q-item>
+            <!-- Menú desplegable del usuario -->
+            <q-menu auto-close anchor="bottom end" self="top end" class="shadow-4 border-radius-8">
+              <q-list style="min-width: 220px" class="q-py-xs">
+                <q-item class="bg-grey-1">
                   <q-item-section avatar>
-                    <q-avatar color="primary" text-color="white" icon="person" />
+                    <q-avatar color="primary" text-color="white" icon="badge" size="36px" />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label class="text-weight-bold">{{ authStore.userName }}</q-item-label>
-                    <q-item-label caption>{{ authStore.userEmail }}</q-item-label>
+                    <q-item-label class="text-weight-bold text-dark">{{
+                      authStore.userName
+                    }}</q-item-label>
+                    <q-item-label caption class="text-grey-6">{{
+                      authStore.userEmail
+                    }}</q-item-label>
+                    <div class="q-mt-xs">
+                      <q-badge
+                        :color="authStore.userRole === 'admin' ? 'primary' : 'secondary'"
+                        class="text-weight-medium"
+                      >
+                        {{ authStore.userRole === 'admin' ? 'Rol Administrador' : 'Rol Técnico' }}
+                      </q-badge>
+                    </div>
                   </q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item clickable @click="confirmLogout">
+
+                <q-separator class="q-my-xs" />
+
+                <q-item clickable v-ripple @click="confirmLogout" class="text-negative">
                   <q-item-section avatar>
                     <q-icon name="logout" color="negative" />
                   </q-item-section>
-                  <q-item-section class="text-negative text-weight-medium"
-                    >Cerrar Sesión</q-item-section
-                  >
+                  <q-item-section class="text-weight-medium">Cerrar Sesión</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
@@ -53,15 +101,20 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in linksList" :key="link.label" v-bind="link" />
-      </q-list>
+    <!-- Drawer Lateral con MenuPrincipal -->
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      :width="260"
+      :breakpoint="800"
+      class="drawer-sidebar"
+    >
+      <MenuPrincipal />
     </q-drawer>
 
-    <q-page-container>
+    <!-- Contenedor Principal de Páginas -->
+    <q-page-container class="main-page-container">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -72,11 +125,17 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
-import EssentialLink from '@/components/EssentialLink.vue'
+import MenuPrincipal from '@/components/MenuPrincipal.vue'
 
 const $q = useQuasar()
 const router = useRouter()
 const authStore = useAuthStore()
+
+const leftDrawerOpen = ref(false)
+
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
 
 const userInitials = computed(() => {
   const name = authStore.userName || 'Usuario'
@@ -91,7 +150,7 @@ const userInitials = computed(() => {
 function confirmLogout() {
   $q.dialog({
     title: 'Cerrar Sesión',
-    message: '¿Está seguro de que desea salir del sistema ERP?',
+    message: '¿Está seguro de que desea salir del sistema ERP XIS?',
     cancel: {
       flat: true,
       label: 'Cancelar',
@@ -110,59 +169,57 @@ function confirmLogout() {
       message: 'Sesión cerrada correctamente.',
       position: 'top-right',
       icon: 'logout',
+      timeout: 2500,
     })
     router.replace('/login')
   })
 }
-
-const linksList = [
-  {
-    label: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    label: 'GitHub',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    label: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    label: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    label: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    label: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    label: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-]
-
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
 </script>
+
+<style scoped lang="scss">
+.topbar-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05) !important;
+}
+
+.drawer-sidebar {
+  border-right: 1px solid #1e293b;
+  background-color: #0d172a;
+}
+
+.main-page-container {
+  background-color: #eaedf2; // Contraste equilibrado sin llegar al modo oscuro
+  min-height: calc(100vh - 50px);
+}
+
+.border-radius-8 {
+  border-radius: 8px;
+}
+
+.border-secondary {
+  border: 1px solid rgba(92, 184, 17, 0.4);
+}
+
+.user-menu-btn {
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: #f1f5f9;
+  }
+}
+
+.avatar-status-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background-color: #5cb811;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+.line-height-tight {
+  line-height: 1.2;
+}
+</style>

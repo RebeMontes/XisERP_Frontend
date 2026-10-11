@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Notify } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
 
-// Create an Axios instance with base configuration
+// Instancia de Axios configurada con la URL base del backend
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   headers: {
@@ -13,7 +13,7 @@ const api = axios.create({
 })
 
 export default defineBoot(({ app, router }) => {
-  // Request Interceptor: Attach JWT Bearer Token if available
+  // Interceptor de peticiones: inyecta el token JWT Bearer si el usuario está autenticado
   api.interceptors.request.use(
     (config) => {
       const authStore = useAuthStore()
@@ -27,7 +27,7 @@ export default defineBoot(({ app, router }) => {
     },
   )
 
-  // Response Interceptor: Global 401 Unauthorized handling & errors
+  // Interceptor de respuestas: captura expiración de token (401) y fallos de red
   api.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -37,8 +37,8 @@ export default defineBoot(({ app, router }) => {
         const { status, config } = error.response
         const isLoginRequest = config.url && config.url.includes('/auth/login')
 
+        // Si la sesión expiró y no es la pantalla de login, limpiar sesión y redirigir
         if (status === 401 && !isLoginRequest) {
-          // Token expired or invalid
           authStore.clearAuth()
 
           Notify.create({
@@ -52,7 +52,7 @@ export default defineBoot(({ app, router }) => {
           router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
         }
       } else if (error.request) {
-        // Network or connection error
+        // Error de red o backend apagado
         Notify.create({
           type: 'negative',
           message: 'No se pudo conectar con el servidor backend. Verifique su conexión.',
@@ -66,7 +66,7 @@ export default defineBoot(({ app, router }) => {
     },
   )
 
-  // Provide $axios and $api globally in Vue components (this.$axios, this.$api)
+  // Hacer disponibles $axios y $api en la instancia global de Vue
   app.config.globalProperties.$axios = axios
   app.config.globalProperties.$api = api
 })

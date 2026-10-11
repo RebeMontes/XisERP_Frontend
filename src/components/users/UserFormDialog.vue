@@ -25,7 +25,7 @@
               {{
                 isEdit
                   ? 'Actualice la información y rol del usuario'
-                  : 'Registre una nueva cuenta para el ERP XIS'
+                  : 'Registre una nueva cuenta para ErpXis'
               }}
             </div>
           </div>
@@ -232,6 +232,7 @@ const form = reactive({
   is_active: true,
 })
 
+// Cargar datos en el formulario al editar o resetear al crear uno nuevo
 watch(
   () => props.user,
   (newUser) => {
@@ -241,9 +242,10 @@ watch(
       form.name = newUser.name || ''
       form.email = newUser.email || ''
       form.role = newUser.role || 'technician'
-      form.password = ''
+      form.password = '' // Contraseña en blanco para no sobreescribirla por accidente
       form.is_active = newUser.is_active !== undefined ? Boolean(newUser.is_active) : true
     } else {
+      // Valores iniciales para usuario nuevo
       form.name = ''
       form.email = ''
       form.role = 'technician'
@@ -258,6 +260,7 @@ function onDialogClose(val) {
   emit('update:modelValue', val)
 }
 
+// Enviar formulario (crear nuevo o actualizar existente)
 async function submitForm() {
   serverError.value = ''
   saving.value = true
@@ -269,6 +272,7 @@ async function submitForm() {
     is_active: form.is_active,
   }
 
+  // Solo incluir contraseña si fue especificada
   if (form.password && form.password.trim().length > 0) {
     payload.password = form.password.trim()
   }
@@ -276,6 +280,7 @@ async function submitForm() {
   try {
     let response
     if (isEdit.value) {
+      // Actualizar usuario existente (PUT)
       response = await api.put(`/users/${props.user.id}`, payload)
       $q.notify({
         type: 'positive',
@@ -285,6 +290,7 @@ async function submitForm() {
         timeout: 3000,
       })
     } else {
+      // Crear usuario nuevo (POST)
       response = await api.post('/users', payload)
       $q.notify({
         type: 'positive',
@@ -298,6 +304,7 @@ async function submitForm() {
     emit('saved', response.data.data)
     emit('update:modelValue', false)
   } catch (error) {
+    // Manejo de errores de validación de backend (código 422)
     if (error.response?.data?.message) {
       serverError.value = error.response.data.message
     } else if (error.response?.data?.errors) {

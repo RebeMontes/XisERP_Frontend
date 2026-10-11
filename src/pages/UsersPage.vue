@@ -17,7 +17,7 @@
           </q-badge>
         </div>
         <div class="text-caption text-grey-8 q-mt-xs">
-          Administración de cuentas, credenciales, técnicos y niveles de acceso al ERP XIS
+          Administración de cuentas, credenciales, técnicos y niveles de acceso a ErpXis
         </div>
       </div>
 
@@ -118,6 +118,7 @@
         @request="onRequest"
         flat
         binary-state-sort
+        rows-per-page-label="Registros por página:"
         no-data-label="No se encontraron usuarios registrados"
         class="users-table"
       >
@@ -313,14 +314,16 @@ const statusFilterOptions = [
   { label: 'Solo Inactivos', value: 'inactive' },
 ]
 
+// Paginación y ordenamiento inicial: alfabético por nombre (A-Z)
 const pagination = ref({
-  sortBy: 'id',
-  descending: true,
+  sortBy: 'user',
+  descending: false,
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 0,
 })
 
+// Configuración de columnas para q-table
 const columns = [
   {
     name: 'user',
@@ -381,13 +384,22 @@ function formatDate(dateStr) {
   })
 }
 
+// Cargar usuarios desde la API con filtros, paginación y ordenamiento
 async function loadUsers() {
   loading.value = true
   try {
+    // Mapear nombre de columna de Quasar a campo real en la base de datos
+    let sortByField = pagination.value.sortBy
+    if (sortByField === 'user') {
+      sortByField = 'name'
+    } else if (sortByField === 'status') {
+      sortByField = 'is_active'
+    }
+
     const params = {
       page: pagination.value.page,
       perPage: pagination.value.rowsPerPage,
-      sortBy: pagination.value.sortBy,
+      sortBy: sortByField,
       descending: pagination.value.descending,
     }
 
@@ -415,6 +427,7 @@ async function loadUsers() {
   }
 }
 
+// Evento de q-table al cambiar de página o hacer clic en encabezados para ordenar
 function onRequest(props) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination
   pagination.value.page = page
@@ -424,20 +437,24 @@ function onRequest(props) {
   loadUsers()
 }
 
+// Abrir modal para crear usuario nuevo
 function openCreateDialog() {
   selectedUser.value = null
   dialogVisible.value = true
 }
 
+// Abrir modal para editar usuario existente
 function openEditDialog(user) {
   selectedUser.value = { ...user }
   dialogVisible.value = true
 }
 
+// Recargar tabla cuando el modal guarda cambios exitosamente
 function onUserSaved() {
   loadUsers()
 }
 
+// Confirmar y cambiar el estado activo/inactivo del usuario
 function confirmToggleStatus(user) {
   const willDeactivate = Boolean(user.is_active)
   const actionText = willDeactivate ? 'desactivar' : 'activar'
@@ -446,7 +463,7 @@ function confirmToggleStatus(user) {
   $q.dialog({
     title: willDeactivate ? 'Desactivar Usuario' : 'Activar Usuario',
     message: willDeactivate
-      ? `¿Está seguro de que desea desactivar a "${user.name}"? El usuario no podrá acceder al sistema ERP XIS hasta ser reactivado.`
+      ? `¿Está seguro de que desea desactivar a "${user.name}"? El usuario no podrá acceder al sistema ErpXis hasta ser reactivado.`
       : `¿Desea reactivar el acceso para "${user.name}"? Podrá volver a iniciar sesión con sus credenciales habituales.`,
     cancel: {
       flat: true,
@@ -482,6 +499,7 @@ function confirmToggleStatus(user) {
   })
 }
 
+// Cargar listado inicial al montar el componente
 onMounted(() => {
   loadUsers()
 })

@@ -9,11 +9,9 @@
               <img src="@/assets/xis-logo.png" alt="XIS Logo" class="login-logo-img" />
             </div>
             <div class="text-h5 text-weight-bolder text-primary">
-              ERP <span class="text-secondary">XIS</span>
+              Erp<span class="text-secondary">Xis</span>
             </div>
-            <div class="text-caption text-grey-7">
-              Gestión Integral de Taller y Servicios de Cómputo
-            </div>
+            <div class="text-caption text-grey-7">Sistema Interno</div>
           </div>
 
           <!-- Alert for Errors -->
@@ -93,7 +91,7 @@
           </q-form>
 
           <div class="text-center text-caption text-grey-6 q-mt-lg">
-            Sistema seguro con autenticación JWT &bull; XIS ERP &copy; {{ currentYear }}
+            Sistema seguro con autenticación JWT &bull; ErpXis &copy; {{ currentYear }}
           </div>
         </q-card>
       </q-page>
@@ -123,16 +121,19 @@ const isPwdVisible = ref(false)
 const loading = ref(false)
 const errorMessage = ref('')
 
+// Procesar autenticación del usuario
 async function handleLogin() {
   errorMessage.value = ''
   loading.value = true
 
   try {
+    // Enviar credenciales a la store de Pinia y backend
     await authStore.login({
       email: form.email,
       password: form.password,
     })
 
+    // Notificación de bienvenida al ingresar
     $q.notify({
       type: 'positive',
       message: `¡Bienvenido(a), ${authStore.userName || 'Usuario'}!`,
@@ -142,10 +143,11 @@ async function handleLogin() {
       timeout: 3000,
     })
 
-    // Redireccionar a la ruta deseada o al inicio
+    // Redirigir a la ruta a la que intentaba entrar o al inicio
     const redirectUrl = route.query.redirect || '/'
     router.replace(redirectUrl)
   } catch (error) {
+    // Extraer mensaje del backend o error de validación
     if (error.response?.data?.message) {
       errorMessage.value = error.response.data.message
     } else if (error.response?.data?.errors) {

@@ -17,9 +17,9 @@
 
         <!-- Título / Contexto del ERP -->
         <q-toolbar-title class="row items-center no-wrap text-subtitle1">
-          <span class="text-weight-bold text-primary">ERP XIS</span>
+          <span class="text-weight-bold text-primary">ErpXis</span>
           <q-separator vertical inset class="q-mx-sm gt-xs" />
-          <span class="text-caption text-grey-7 gt-xs">Control de Reparaciones y Soporte</span>
+          <span class="text-caption text-grey-7 gt-xs">Sistema Interno</span>
         </q-toolbar-title>
 
         <q-space />
@@ -150,7 +150,7 @@ const userInitials = computed(() => {
 function confirmLogout() {
   $q.dialog({
     title: 'Cerrar Sesión',
-    message: '¿Está seguro de que desea salir del sistema ERP XIS?',
+    message: '¿Está seguro de que desea salir del sistema ErpXis?',
     cancel: {
       flat: true,
       label: 'Cancelar',

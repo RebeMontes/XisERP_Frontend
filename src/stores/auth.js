@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
+    // Helpers para verificar autenticación y rol del usuario en vistas y menú
     isAuthenticated: (state) => !!state.token,
     getUser: (state) => state.user,
     userName: (state) => state.user?.name || '',
@@ -19,18 +20,21 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    // Guarda el token y el usuario en el estado
     setAuth(payload) {
       this.token = payload.access_token || payload.token
       this.user = payload.user || null
       this.expiresIn = payload.expires_in || null
     },
 
+    // Limpia el estado de autenticación (reseteo a null)
     clearAuth() {
       this.token = null
       this.user = null
       this.expiresIn = null
     },
 
+    // Iniciar sesión y guardar sesión si es exitoso
     async login(credentials) {
       const response = await api.post('/auth/login', credentials)
       if (response.data?.success && response.data?.data) {
@@ -39,6 +43,7 @@ export const useAuthStore = defineStore('auth', {
       return response.data
     },
 
+    // Obtener los datos frescos del usuario autenticado (/auth/me)
     async fetchUser() {
       if (!this.token) return null
       try {
@@ -53,6 +58,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Renovar el token JWT
     async refreshToken() {
       try {
         const response = await api.post('/auth/refresh')
@@ -66,19 +72,21 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Cerrar sesión en el backend e invalidar el estado local
     async logout() {
       try {
         if (this.token) {
           await api.post('/auth/logout')
         }
       } catch {
-        // Silently catch network or expired token errors on logout
+        // Ignorar errores de red si el token ya venció en el backend
       } finally {
         this.clearAuth()
       }
     },
   },
 
+  // Persistir token y usuario en localStorage para mantener sesión al recargar la página
   persist: {
     key: 'erp_xis_auth',
     storage: localStorage,

@@ -35,16 +35,18 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   })
 
-  // Global Navigation Guard for Authentication
+  // Guard de navegación global para proteger rutas con JWT
   Router.beforeEach((to) => {
     const authStore = useAuthStore()
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
     const guestOnly = to.matched.some((record) => record.meta.guestOnly)
 
+    // Si la ruta requiere sesión y no hay token, redirigir al login guardando la ruta previa
     if (requiresAuth && !authStore.isAuthenticated) {
       return { name: 'login', query: { redirect: to.fullPath } }
     }
 
+    // Si la ruta es exclusiva para invitados (ej. login) y ya está autenticado, mandar al inicio
     if (guestOnly && authStore.isAuthenticated) {
       return '/'
     }

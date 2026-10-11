@@ -7,9 +7,9 @@
       </div>
       <div class="column">
         <div class="text-weight-bolder text-h6 text-white brand-title">
-          ERP <span class="brand-highlight">XIS</span>
+          Erp<span class="brand-highlight">Xis</span>
         </div>
-        <div class="text-caption brand-subtitle">Servicios y Cómputo</div>
+        <div class="text-caption brand-subtitle">Sistema Interno</div>
       </div>
     </div>
 

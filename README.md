@@ -1,4 +1,4 @@
-# Quasar App (quasar-project)
+# ErpXis - Sistema Interno
 
 ## Install the dependencies
 

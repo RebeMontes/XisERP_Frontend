@@ -5,9 +5,7 @@
       <div class="text-h5 text-weight-bold text-dark">
         Bienvenido(a), {{ authStore.userName || 'Usuario' }}
       </div>
-      <div class="text-caption text-grey-8">
-        Panel de Control &bull; ERP XIS Sistema de Reparación y Soporte
-      </div>
+      <div class="text-caption text-grey-8">Panel de Control &bull; ErpXis - Sistema Interno</div>
     </div>
 
     <!-- Tarjetas de Métricas Rápidas -->

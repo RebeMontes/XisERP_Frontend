@@ -7,7 +7,12 @@ const routes = [
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
       { path: 'clientes', name: 'clientes', component: () => import('@/pages/CustomersPage.vue') },
-      { path: 'usuarios', name: 'usuarios', component: () => import('@/pages/UsersPage.vue') },
+      {
+        path: 'usuarios',
+        name: 'usuarios',
+        component: () => import('@/pages/UsersPage.vue'),
+        meta: { requiresAdmin: true },
+      },
     ],
   },
   // Pantalla de login: solo accesible para invitados (sin sesión activa)

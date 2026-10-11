@@ -62,8 +62,9 @@
           </q-item-section>
         </q-item>
 
-        <!-- Usuarios -->
+        <!-- Usuarios (Solo Administradores) -->
         <q-item
+          v-if="authStore.isAdmin"
           clickable
           v-ripple
           to="/usuarios"
@@ -98,7 +99,9 @@
 </template>
 
 <script setup>
-// Componente de Menú Principal con alto contraste y diseño premium
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 </script>
 
 <style scoped lang="scss">

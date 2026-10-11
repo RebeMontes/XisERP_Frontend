@@ -51,6 +51,19 @@ export default defineBoot(({ app, router }) => {
 
           router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
         }
+
+        // Permisos insuficientes (403 Forbidden)
+        if (status === 403) {
+          Notify.create({
+            type: 'negative',
+            message:
+              error.response.data?.message ||
+              'Acceso denegado: no cuenta con permisos para esta acción.',
+            position: 'top-right',
+            icon: 'gpp_bad',
+            timeout: 4000,
+          })
+        }
       } else if (error.request) {
         // Error de red o backend apagado
         Notify.create({

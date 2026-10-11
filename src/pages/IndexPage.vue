@@ -1,34 +1,12 @@
 <template>
   <q-page class="q-pa-lg">
     <!-- Header de Bienvenida -->
-    <div class="row items-center justify-between q-mb-lg">
-      <div>
-        <div class="text-h5 text-weight-bold text-dark">
-          Bienvenido(a), {{ authStore.userName || 'Usuario' }}
-        </div>
-        <div class="text-caption text-grey-7">
-          Panel de Control &bull; ERP XIS Sistema de Reparación y Soporte
-        </div>
+    <div class="q-mb-lg">
+      <div class="text-h5 text-weight-bold text-dark">
+        Bienvenido(a), {{ authStore.userName || 'Usuario' }}
       </div>
-      <div class="row items-center q-gutter-sm">
-        <q-btn
-          color="primary"
-          icon="people"
-          label="Ir a Clientes"
-          to="/clientes"
-          no-caps
-          unelevated
-          class="border-radius-8"
-        />
-        <q-btn
-          color="secondary"
-          icon="manage_accounts"
-          label="Ir a Usuarios"
-          to="/usuarios"
-          no-caps
-          unelevated
-          class="border-radius-8"
-        />
+      <div class="text-caption text-grey-8">
+        Panel de Control &bull; ERP XIS Sistema de Reparación y Soporte
       </div>
     </div>
 

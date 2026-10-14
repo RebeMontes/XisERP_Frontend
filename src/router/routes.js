@@ -1,15 +1,29 @@
 const routes = [
+  // Rutas privadas del ERP: requieren autenticación activa
   {
     path: '/',
     component: () => import('@/layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
-      { path: 'second', component: () => import('@/pages/SecondPage.vue') },
+      { path: 'clientes', name: 'clientes', component: () => import('@/pages/CustomersPage.vue') },
+      {
+        path: 'usuarios',
+        name: 'usuarios',
+        component: () => import('@/pages/UsersPage.vue'),
+        meta: { requiresAdmin: true },
+      },
     ],
   },
+  // Pantalla de login: solo accesible para invitados (sin sesión activa)
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/LoginPage.vue'),
+    meta: { guestOnly: true },
+  },
 
-  // Always leave this as last one,
-  // but you can also remove it
+  // Ruta comodín para capturar páginas no encontradas (404)
   {
     path: '/:catchAll(.*)*',
     component: () => import('@/pages/ErrorNotFound.vue'),

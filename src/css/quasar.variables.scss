@@ -12,14 +12,15 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-$primary: #1976d2;
-$secondary: #26a69a;
-$accent: #9c27b0;
+// Brand colors extracted from XIS Logo (Royal Electric Blue & Tech Lime Green)
+$primary: #1254e0; // Royal Electric Blue ("Xis")
+$secondary: #5cb811; // Tech Lime Green (Marco monitor)
+$accent: #22c55e; // Matrix Green
 
-$dark: #1d1d1d;
-$dark-page: #121212;
+$dark: #0f172a; // Dark Slate 900 (Premium Sidebar / Contrast)
+$dark-page: #0b1120;
 
-$positive: #21ba45;
-$negative: #c10015;
-$info: #31ccec;
-$warning: #f2c037;
+$positive: #16a34a;
+$negative: #dc2626;
+$info: #0284c7;
+$warning: #f59e0b;

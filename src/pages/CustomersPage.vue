@@ -122,7 +122,7 @@
             </q-td>
             
             <!-- Columna de Cliente (Razón Social / Nombre Comercial) -->
-            <q-td :props="props">
+            <q-td key="legal_name" :props="props">
               <div class="column">
                 <span class="text-weight-bold text-dark text-body2">
                   {{ props.row.legal_name }}
@@ -136,8 +136,9 @@
               </div>
             </q-td>
 
+
             <!-- Columna Datos Fiscales (RFC / Régimen) -->
-            <q-td :props="props">
+            <q-td key="tax_info" :props="props">
               <div class="column">
                 <span class="text-weight-bold text-dark">{{ props.row.tax_id || 'N/D' }}</span>
                 <span class="text-caption text-grey-7">Régimen: {{ props.row.tax_regime || 'N/D' }}</span>
@@ -145,7 +146,7 @@
             </q-td>
 
             <!-- Columna Contacto (Teléfono / Email) -->
-            <q-td :props="props">
+            <q-td key="contact" :props="props">
               <div class="column">
                 <span class="text-grey-8" v-if="props.row.phone">
                   <q-icon name="phone" size="13px" class="q-mr-xs text-grey-6" />
@@ -162,7 +163,7 @@
             </q-td>
 
             <!-- Columna Estado (Activo / Inactivo) -->
-            <q-td :props="props">
+            <q-td key="status" :props="props">
               <q-chip
                 v-if="props.row.is_active"
                 dense
@@ -178,7 +179,7 @@
             </q-td>
 
             <!-- Columna de Acciones -->
-            <q-td :props="props" class="text-right">
+            <q-td key="actions" :props="props" class="text-right">
               <div class="row items-center justify-end q-gutter-x-xs no-wrap">
                 <q-btn
                   flat
@@ -305,8 +306,35 @@ import ClientFormDialog from '@/components/clients/ClientFormDialog.vue'
 const $q = useQuasar()
 
 const loading = ref(false)
-const clients = ref([])
-const totalClients = ref(0)
+const clients = ref([
+{
+    id: 1,
+    customer_number: 'CLI-001',
+    legal_name: 'Empresa Ejemplo S.A. de C.V.',
+    trade_name: 'Ejemplo Store',
+    tax_id: 'XAXX010101000',
+    tax_regime: '601 - General de Ley Personas Morales',
+    payment_method: 'PUE',
+    account_number: '1234',
+    phone: '8681234567',
+    email: 'contacto@ejemplo.com',
+    contact_name: 'Juan Pérez',
+    whatsapp: '8687654321',
+    phone_type: 'Móvil',
+    is_active: true,
+    street: 'Av. Independencia',
+    exterior_number: '100',
+    interior_number: 'B',
+    neighborhood: 'Centro',
+    city: 'Matamoros',
+    municipality: 'Matamoros',
+    state: 'Tamaulipas',
+    postal_code: '87300',
+    address_references: 'Frente a la plaza principal',
+    notes: 'Cliente preferente de prueba.'
+  }
+])
+const totalClients = ref(1)
 
 const dialogVisible = ref(false)
 const selectedClient = ref(null)
@@ -331,6 +359,13 @@ const pagination = ref({
 })
 
 const columns = [
+  {
+    name: 'expand',
+    label: 'Más Información',
+    align: 'center',
+    field: 'expand',
+    sortable: false,
+  },
   {
     name: 'legal_name',
     label: 'Cliente / Empresa',
@@ -457,7 +492,7 @@ function confirmToggleStatus(client) {
 }
 
 onMounted(() => {
-  loadClients()
+  //loadClients()
 })
 </script>
 

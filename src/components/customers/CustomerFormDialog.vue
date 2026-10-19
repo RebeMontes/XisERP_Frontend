@@ -44,7 +44,7 @@
                 </div>
                 <div class="col-12 col-sm-6">
                   <q-input
-                    v-model="form.tax_id"
+                    v-model="form.taxid"
                     label="RFC / Tax ID"
                     outlined
                     dense
@@ -88,7 +88,7 @@
                 </div>
                 <div class="col-12 col-sm-6">
                   <q-input
-                    v-model="form.account_number"
+                    v-model="form.account_num"
                     label="Número de Cuenta"
                     outlined
                     dense
@@ -104,10 +104,10 @@
                   <q-input v-model="form.street" label="Calle" outlined dense />
                 </div>
                 <div class="col-6 col-sm-2">
-                  <q-input v-model="form.exterior_number" label="N° Ext." outlined dense />
+                  <q-input v-model="form.exterior_num" label="N° Ext." outlined dense />
                 </div>
                 <div class="col-6 col-sm-2">
-                  <q-input v-model="form.interior_number" label="N° Int." outlined dense />
+                  <q-input v-model="form.interior_num" label="N° Int." outlined dense />
                 </div>
                 <div class="col-12 col-sm-6">
                   <q-input v-model="form.neighborhood" label="Colonia / Fraccionamiento" outlined dense />
@@ -215,15 +215,15 @@ const isEditing = computed(() => Boolean(props.client && props.client.id))
 
 const defaultForm = {
   customer_number: '',
-  tax_id: '',
+  taxid: '',
   tax_regime: '',
   legal_name: '',
   trade_name: '',
   payment_method: '',
-  account_number: '',
+  account_num: '',
   street: '',
-  exterior_number: '',
-  interior_number: '',
+  exterior_num: '',
+  interior_num: '',
   neighborhood: '',
   city: '',
   municipality: '',
@@ -259,14 +259,14 @@ async function onSubmit() {
   saving.value = true
   try {
     if (isEditing.value) {
-      await api.put(`/clients/${props.client.id}`, form)
+      await api.put(`/customers/${props.client.id}`, form)
       $q.notify({
         type: 'positive',
         message: 'Cliente actualizado correctamente.',
         position: 'top-right',
       })
     } else {
-      await api.post('/clients', form)
+      await api.post('/customers', form)
       $q.notify({
         type: 'positive',
         message: 'Cliente creado correctamente.',

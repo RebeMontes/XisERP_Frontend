@@ -92,7 +92,7 @@
    <!-- Tabla Principal de Clientes -->
     <q-card flat class="border-radius-12 bg-white card-border shadow-1 overflow-hidden">
       <q-table
-        :rows="clients"
+        :rows="customers"
         :columns="columns"
         row-key="id"
         :loading="loading"
@@ -136,11 +136,10 @@
               </div>
             </q-td>
 
-
             <!-- Columna Datos Fiscales (RFC / Régimen) -->
             <q-td key="tax_info" :props="props">
               <div class="column">
-                <span class="text-weight-bold text-dark">{{ props.row.tax_id || 'N/D' }}</span>
+                <span class="text-weight-bold text-dark">{{ props.row.taxid || 'N/D' }}</span>
                 <span class="text-caption text-grey-7">Régimen: {{ props.row.tax_regime || 'N/D' }}</span>
               </div>
             </q-td>
@@ -217,6 +216,18 @@
                 >
                   <q-tooltip>Activar cliente</q-tooltip>
                 </q-btn>
+
+                <q-btn
+                flat
+                round
+                dense
+                color="negative"
+                icon="delete"
+                class="action-btn"
+                @click="confirmDeleteCustomer(props.row)"
+              >
+                <q-tooltip>Eliminar definitivamente</q-tooltip>
+              </q-btn>
               </div>
             </q-td>
           </q-tr>
@@ -233,7 +244,7 @@
                     </div>
                     <div class="text-caption text-grey-8"><b>Régimen:</b> {{ props.row.tax_regime || 'No especificado' }}</div>
                     <div class="text-caption text-grey-8"><b>Método de Pago:</b> {{ props.row.payment_method || 'No especificado' }}</div>
-                    <div class="text-caption text-grey-8"><b>N° Cuenta:</b> {{ props.row.account_number || 'No especificado' }}</div>
+                    <div class="text-caption text-grey-8"><b>N° Cuenta:</b> {{ props.row.account_num || 'No especificado' }}</div>
                   </q-card>
                 </div>
 
@@ -244,7 +255,7 @@
                       <q-icon name="place" size="18px" class="q-mr-xs" /> Domicilio
                     </div>
                     <div class="text-caption text-grey-8">
-                      <b>Dirección:</b> {{ props.row.street || 'S/N' }} #{{ props.row.exterior_number || '' }} {{ props.row.interior_number ? 'Int. ' + props.row.interior_number : '' }}
+                      <b>Dirección:</b> {{ props.row.street || 'S/N' }} #{{ props.row.exterior_num || '' }} {{ props.row.interior_num ? 'Int. ' + props.row.interior_num : '' }}
                     </div>
                     <div class="text-caption text-grey-8"><b>Colonia:</b> {{ props.row.neighborhood || 'N/D' }}</div>
                     <div class="text-caption text-grey-8"><b>Ciudad / Municipio:</b> {{ props.row.city || 'N/D' }}, {{ props.row.municipality || 'N/D' }}</div>
@@ -270,14 +281,14 @@
           </q-tr>
         </template>
 
-        <!-- Slot de Carga Personalizado (AHORA DENTRO DE LA Q-TABLE) -->
+        <!-- Slot de Carga Personalizado -->
         <template #loading>
           <q-inner-loading showing color="primary">
             <q-spinner-dots size="48px" />
           </q-inner-loading>
         </template>
 
-        <!-- Slot Sin Datos (AHORA DENTRO DE LA Q-TABLE) -->
+        <!-- Slot Sin Datos -->
         <template #no-data="{ message }">
           <div class="full-width column flex-center q-pa-xl text-grey-6">
             <q-icon name="search_off" size="48px" class="q-mb-sm text-grey-5" />
@@ -289,7 +300,7 @@
     </q-card>
     
     <!-- Componente Modal para Crear/Editar Cliente -->
-    <ClientFormDialog
+    <CustomerFormDialog
       v-model="dialogVisible"
       :client="selectedClient"
       @saved="onClientSaved"
@@ -301,40 +312,13 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { api } from '@/boot/axios'
-import ClientFormDialog from '@/components/clients/ClientFormDialog.vue'
+import CustomerFormDialog from '@/components/customers/CustomerFormDialog.vue'
 
 const $q = useQuasar()
 
 const loading = ref(false)
-const clients = ref([
-{
-    id: 1,
-    customer_number: 'CLI-001',
-    legal_name: 'Empresa Ejemplo S.A. de C.V.',
-    trade_name: 'Ejemplo Store',
-    tax_id: 'XAXX010101000',
-    tax_regime: '601 - General de Ley Personas Morales',
-    payment_method: 'PUE',
-    account_number: '1234',
-    phone: '8681234567',
-    email: 'contacto@ejemplo.com',
-    contact_name: 'Juan Pérez',
-    whatsapp: '8687654321',
-    phone_type: 'Móvil',
-    is_active: true,
-    street: 'Av. Independencia',
-    exterior_number: '100',
-    interior_number: 'B',
-    neighborhood: 'Centro',
-    city: 'Matamoros',
-    municipality: 'Matamoros',
-    state: 'Tamaulipas',
-    postal_code: '87300',
-    address_references: 'Frente a la plaza principal',
-    notes: 'Cliente preferente de prueba.'
-  }
-])
-const totalClients = ref(1)
+const customers = ref([])
+const totalClients = ref(0)
 
 const dialogVisible = ref(false)
 const selectedClient = ref(null)
@@ -361,12 +345,13 @@ const pagination = ref({
 const columns = [
   {
     name: 'expand',
-    label: 'Más Información',
+    label: '',
     align: 'center',
     field: 'expand',
     sortable: false,
   },
   {
+
     name: 'legal_name',
     label: 'Cliente / Empresa',
     align: 'left',
@@ -377,7 +362,7 @@ const columns = [
     name: 'tax_info',
     label: 'Datos Fiscales (RFC)',
     align: 'left',
-    field: 'tax_id',
+    field: 'taxid',
     sortable: true,
   },
   {
@@ -400,7 +385,7 @@ const columns = [
   },
 ]
 
-// Cargar clientes con filtros y paginación desde el backend
+// Cargar clientes con filtros y paginación desde el backend usando /customers
 async function loadClients() {
   loading.value = true
   try {
@@ -414,10 +399,10 @@ async function loadClients() {
     if (filters.search) params.search = filters.search
     if (filters.status) params.status = filters.status
 
-    const response = await api.get('/clients', { params })
+    const response = await api.get('/customers', { params })
 
     if (response.data?.success) {
-      clients.value = response.data.data
+      customers.value = response.data.data
       const meta = response.data.meta
       pagination.value.rowsNumber = meta.total
       totalClients.value = meta.total
@@ -472,7 +457,8 @@ function confirmToggleStatus(client) {
     persistent: true,
   }).onOk(async () => {
     try {
-      const response = await api.patch(`/clients/${client.id}/toggle-status`)
+      // CORREGIDO: Se usa client.id en lugar de customer.id
+      const response = await api.patch(`/customers/${client.id}/toggle-status`)
       $q.notify({
         type: 'positive',
         message: response.data.message || `Cliente ${actionText}do correctamente.`,
@@ -490,9 +476,36 @@ function confirmToggleStatus(client) {
     }
   })
 }
+function confirmDeleteCustomer(client) {
+  $q.dialog({
+    title: 'Eliminar Cliente',
+    message: `¿Estás completamente seguro de eliminar permanentemente a "${client.legal_name}"? Esta acción no se puede deshacer.`,
+    cancel: { flat: true, label: 'Cancelar', color: 'grey-7' },
+    ok: { label: 'Sí, Eliminar', color: 'negative' },
+    persistent: true,
+  }).onOk(async () => {
+    try {
+      const response = await api.delete(`/customers/${client.id}`)
+      $q.notify({
+        type: 'positive',
+        message: response.data.message || 'Cliente eliminado correctamente.',
+        position: 'top-right',
+        icon: 'check_circle',
+      })
+      loadClients() // Recarga el listado para reflejar los cambios
+    } catch (error) {
+      $q.notify({
+        type: 'negative',
+        message: error.response?.data?.message || 'No se pudo eliminar el cliente.',
+        position: 'top-right',
+        icon: 'error',
+      })
+    }
+  })
+}
 
 onMounted(() => {
-  //loadClients()
+  loadClients()
 })
 </script>
 

@@ -62,6 +62,26 @@
           </q-item-section>
         </q-item>
 
+        <!-- Empresas -->
+        <q-item
+          clickable
+          v-ripple
+          to="/empresas"
+          active-class="menu-item-active"
+          class="menu-item border-radius-8"
+        >
+          <q-item-section avatar class="item-icon-section">
+            <q-icon name="business" size="22px" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">Empresas</q-item-label>
+            <q-item-label caption class="item-caption">Padrón de empresas</q-item-label>
+          </q-item-section>
+          <q-item-section side class="active-indicator-side">
+            <q-icon name="chevron_right" size="18px" class="active-arrow" />
+          </q-item-section>
+        </q-item>
+
         <!-- Usuarios (Solo Administradores) -->
         <q-item
           v-if="authStore.isAdmin"

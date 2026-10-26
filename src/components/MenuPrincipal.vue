@@ -82,6 +82,45 @@
           </q-item-section>
         </q-item>
 
+        <!-- Productos -->
+        <q-item
+          clickable
+          v-ripple
+          to="/productos"
+          active-class="menu-item-active"
+          class="menu-item border-radius-8"
+        >
+          <q-item-section avatar class="item-icon-section">
+            <q-icon name="inventory_2" size="22px" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">Productos</q-item-label>
+            <q-item-label caption class="item-caption">Tabla de productos</q-item-label>
+          </q-item-section>
+          <q-item-section side class="active-indicator-side">
+            <q-icon name="chevron_right" size="18px" class="active-arrow" />
+          </q-item-section>
+        </q-item>
+
+        <!-- Conceptos -->
+        <q-item
+          clickable
+          v-ripple
+          to="/conceptos"
+          active-class="menu-item-active"
+          class="menu-item border-radius-8"
+        >
+          <q-item-section avatar class="item-icon-section">
+            <q-icon name="lightbulb" size="22px" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">Conceptos</q-item-label>
+          </q-item-section>
+          <q-item-section side class="active-indicator-side">
+            <q-icon name="chevron_right" size="18px" class="active-arrow" />
+          </q-item-section>
+        </q-item>
+
         <!-- Usuarios (Solo Administradores) -->
         <q-item
           v-if="authStore.isAdmin"

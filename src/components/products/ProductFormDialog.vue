@@ -69,6 +69,7 @@
                     outlined
                     dense
                     placeholder="Ej. 02 - Sí objeto de impuesto"
+                    :rules="[ val => !val || val.length <= 2 || 'Máximo 2 caracteres']"
                   />
                 </div>
                 <div class="col-12">
@@ -101,12 +102,12 @@
                         map-options
                         outlined
                         dense
-                        label="Categoría *"
+                        label="Categoría"
                         :rules="[val => !!val || 'Selecciona una categoría']"
                       />
                     </div>
                     <div class="col-auto">
-                      <q-btn color="primary" icon="add" round dense unelevated class="q-mb-md" @click="openQuickAddModal('category')" title="Nueva Categoría" />
+                      <q-btn color="primary" icon="add" round dense unelevated class="q-mb-md" @click="openQuickAdd('categories')" title="Nueva Categoría" />
                     </div>
                   </div>
                 </div>
@@ -128,7 +129,7 @@
                       />
                     </div>
                     <div class="col-auto">
-                      <q-btn color="primary" icon="add" round dense unelevated @click="openQuickAddModal('subcategory')" title="Nueva Subcategoría" />
+                      <q-btn color="primary" icon="add" round dense unelevated @click="openQuickAdd('subcategories')" title="Nueva Subcategoría" />
                     </div>
                   </div>
                 </div>
@@ -150,7 +151,7 @@
                       />
                     </div>
                     <div class="col-auto">
-                      <q-btn color="primary" icon="add" round dense unelevated @click="openQuickAddModal('brand')" title="Nueva Marca" />
+                      <q-btn color="primary" icon="add" round dense unelevated @click="openQuickAdd('brands')" title="Nueva Marca" />
                     </div>
                   </div>
                 </div>
@@ -173,7 +174,7 @@
                       />
                     </div>
                     <div class="col-auto">
-                      <q-btn color="primary" icon="add" round dense unelevated class="q-mb-md" @click="openQuickAddModal('unit')" title="Nueva Unidad" />
+                      <q-btn color="primary" icon="add" round dense unelevated class="q-mb-md" @click="openQuickAdd('units')" title="Nueva Unidad" />
                     </div>
                   </div>
                 </div>
@@ -284,12 +285,24 @@
       </q-form>
     </q-card>
   </q-dialog>
+
+  <QuickAddDialog
+    v-model="showQuickModal"
+    :type="quickType"
+    :categories-options="categoriesOptions"
+    @saved="handleQuickSaved"
+  />
+
 </template>
 
 <script setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { api } from '@/boot/axios'
+import QuickAddDialog from '@/components/concepts/QuickAddDialog.vue'
+
+const showQuickModal = ref(false)
+const quickType = ref('')
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -315,29 +328,27 @@ const isOpen = computed({
 
 const isEditing = computed(() => Boolean(props.product && props.product.id))
 
-// Objeto base alineado con los campos exactos de tu base de datos
 const defaultForm = {
+  name: '',
   code: '',
   sat_product_code: '',
   product_type: '',
-  name: '',
+  tax_object_code: '',
+  description: '',
   category_id: null,
   subcategory_id: null,
   brand_id: null,
   unit_id: null,
-  description: '',
+  storage_location: '',
+  image_path: '',
   cost: 0,
   retail_price: 0,
   wholesale_price: 0,
-  tax_object_code: '',
-  track_inventory: 1,
   stock_quantity: 0,
   minimum_stock: 0,
-  storage_location: '',
-  image_path: '',
+  track_inventory: 1,
   is_active: 1,
 }
-
 const form = reactive({ ...defaultForm })
 
 // Configuración para los diálogos rápidos al vuelo
@@ -374,51 +385,32 @@ async function loadAllCatalogs() {
 }
 
 // Función para crear registros "al vuelo"
-// Temporal (Se mejorará para guardar todos los datos)
-function openQuickAddModal(type) {
-  const config = catalogConfigs[type]
-  if (!config) return
+function openQuickAdd(type) {
+  quickType.value = type
+  showQuickModal.value = true
+}
 
-  $q.dialog({
-    title: `Nueva ${config.title}`,
-    message: `Escribe el nombre de la nueva ${config.title.toLowerCase()}:`,
-    prompt: { model: '', type: 'text' },
-    cancel: { label: 'Cancelar', flat: true },
-    ok: { label: 'Guardar', color: 'primary' }
-  }).onOk(async (newName) => {
-    if (!newName || newName.trim() === '') return
-
-    try {
-      const res = await api.post(config.endpoint, { name: newName, is_active: 1 })
-      if (res.data?.success) {
-        const created = res.data.data
-        const newOption = { label: created.name, value: created.id }
-
-        config.options.value.push(newOption)
-        form[`${type}_id`] = created.id
-
-        $q.notify({
-          type: 'positive',
-          message: `${config.title} creada y seleccionada.`,
-          position: 'top-right',
-          timeout: 1500
-        })
-      }
-    } catch (error) {
-      $q.notify({
-        type: 'negative',
-        message: error.response?.data?.message || `Error al crear ${config.title.toLowerCase()}.`,
-        position: 'top-right'
-      })
-    }
-  })
+function handleQuickSaved({ type, item }) {
+  if (type === 'category') {
+    categoryOptions.value.push({ label: item.name, value: item.id })
+    form.category_id = item.id
+  } else if (type === 'subcategory') {
+    subcategoryOptions.value.push({ label: item.name, value: item.id })
+    form.subcategory_id = item.id
+  } else if (type === 'brand') {
+    brandOptions.value.push({ label: item.name, value: item.id })
+    form.brand_id = item.id
+  } else if (type === 'unit') {
+    unitOptions.value.push({ label: item.name, value: item.id })
+    form.unit_id = item.id
+  }
 }
 
 watch(
   () => props.product,
   (newProd) => {
     tab.value = 'general'
-    if (newProd) {
+    if (newProd && newProd.id) {
       Object.assign(form, defaultForm, newProd)
     } else {
       Object.assign(form, defaultForm)
@@ -428,7 +420,12 @@ watch(
 )
 
 watch(isOpen, (newVal) => {
-  if (newVal) loadAllCatalogs()
+  if (newVal) {
+    loadAllCatalogs()
+    if (!props.product || !props.product.id) {
+      Object.assign(form, defaultForm)
+    }
+  }
 })
 
 async function onSubmit() {
